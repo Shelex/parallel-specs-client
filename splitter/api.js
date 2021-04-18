@@ -15,6 +15,7 @@ const projectQuery = (name) => ({
                           estimatedDuration
                           start
                           end
+                          assignedTo
                         }
                       }
                     }
@@ -44,14 +45,15 @@ const addSessionQuery = (projectName, specs) => ({
   operationName: "addSession",
 });
 
-const nextSpecQuery = (sessionID) => ({
+const nextSpecQuery = (sessionID, machineID) => ({
   query: `
-          query nextSpec($sessionId: String!) {
-              nextSpec(sessionId: $sessionId)
+          query nextSpec($sessionId: String!, $machineId: String) {
+              nextSpec(sessionId: $sessionId, machineId: $machineId)
               }
             `,
   variables: {
     sessionId: sessionID,
+    machineId: machineID,
   },
   operationName: "nextSpec",
 });
@@ -74,13 +76,13 @@ const createSession = (opts, projectName, specs) =>
     body: JSON.stringify(addSessionQuery(projectName, specs)),
   }).json();
 
-const nextSpec = (opts, sessionID) =>
+const nextSpec = (opts, sessionID, machineID) =>
   fetch(opts.url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(nextSpecQuery(sessionID)),
+    body: JSON.stringify(nextSpecQuery(sessionID, machineID)),
   }).json();
 
 module.exports = {

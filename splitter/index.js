@@ -16,9 +16,8 @@ class SplitTestClient {
     return split.projectInfo(this.options, name);
   }
 
-  nextSpec(sessionId = this.options.sessionId) {
-    console.log(`get nextSpec`);
-    return split.nextSpec(this.options, sessionId);
+  nextSpec(machineId = 'default', sessionId = this.options.sessionId) {
+    return split.nextSpec(this.options, sessionId, machineId);
   }
 
   addSession(specs, projectName = this.options.project) {

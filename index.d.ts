@@ -61,11 +61,13 @@ declare class SplitterClient {
   constructor(options?: SplitterOptions);
 
   project(name?: string): ProjectResponse;
-  nextSpec(sessionId?: string): NextSpecResponse;
+  nextSpec(machineId?: string, sessionId?: string): NextSpecResponse;
   addSession(specs: SpecInput[], projectName?: string): CreateSessionResponse;
 }
 
-export = {
-  SplitterClient,
+type SplitSpecs = {
+  SplitterClient: SplitterClient,
   filesToSpecInput(includes: Pattern[], exludes: Pattern[]): SpecInput[];
-};
+}
+
+export = SplitSpecs
