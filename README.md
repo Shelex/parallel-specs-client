@@ -112,8 +112,7 @@ terms of the [MIT License](https://opensource.org/licenses/MIT).
 See LICENSE for full details.
 
 [npm-url]: https://npmjs.com/package/@shelex/split-specs-client
-[gh-image]: https://github.com/Shelex/split-specs-client/workflows/Release/badge.svg?branch=master
-[types-path]: ./index.d.ts
+[gh-image]: https://github.com/Shelex/split-specs-client/workflows/build/badge.svg?branch=master
 [semantic-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 [semantic-url]: https://github.com/semantic-release/semantic-release
 [license-image]: https://img.shields.io/npm/l/@shelex/split-specs-client
