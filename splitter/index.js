@@ -2,32 +2,54 @@ const split = require("./api");
 
 class SplitTestClient {
   options = {
-    url: "https://test-splitter.appspot.com/query",
+    url: "http://split-specs.appspot.com/query",
     project: null,
-    sessionId: null
-  }
+    sessionId: null,
+    token: null,
+    username: null,
+    password: null,
+  };
 
   constructor(options = {}) {
-    console.log(`in constructor`);
     this.options = { ...this.options, ...options };
+    if (!this.options.token) {
+      const res = split.login(this.options);
+      if (res.errors) {
+        throw new Error(res.errors[0].message);
+      }
+      this.options.token = res.data.login;
+    }
   }
 
   project(name = this.options.project) {
-    return split.projectInfo(this.options, name);
+    const res = split.projectInfo(this.options, name);
+    if (res.errors) {
+      throw new Error(res.errors[0].message);
+    }
+    return res.data.project;
   }
 
-  nextSpec(machineId = 'default', sessionId = this.options.sessionId) {
-    return split.nextSpec(this.options, sessionId, machineId);
+  nextSpec(machineId = "default", sessionId = this.options.sessionId) {
+    const res = split.nextSpec(this.options, sessionId, machineId);
+    if (res.errors) {
+      if (res.errors[0].message === "session finished") {
+        return null;
+      }
+      throw new Error(res.errors[0].message);
+    }
+    return res.data.nextSpec;
   }
 
   addSession(specs, projectName = this.options.project) {
-    console.log(`get addSession`);
     const res = split.createSession(this.options, projectName, specs);
-    if (res && res.data && res.data && res.data.addSession) {
-      this.options.sessionId = res.data.addSession.sessionId
+    if (res.errors) {
+      throw new Error(res.errors[0].message);
     }
-    return res
+    if (res && res.data && res.data && res.data.addSession) {
+      this.options.sessionId = res.data.addSession.sessionId;
+    }
+    return res.data.addSession;
   }
 }
 
-module.exports = SplitTestClient
+module.exports = SplitTestClient;

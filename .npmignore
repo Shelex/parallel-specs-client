@@ -1,5 +1,6 @@
 # Node stuff:
 node_modules
+examples
 *.log
 
 # OS Stuff:

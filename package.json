@@ -1,17 +1,32 @@
 {
-  "name": "split-specs-client",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@shelex/split-specs-client",
+  "version": "0.0.0-development",
+  "description": "api client for orchestrator service for your spec files during parallel testing across different machines",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node examples/test.js"
   },
   "author": {
     "name": "Oleksandr Shevtsov",
     "email": "ovr.shevtsov@gmail.com"
   },
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shelex/split-specs-client.git"
+  },
+  "bugs": "https://github.com/Shelex/split-specs-client/issues",
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "testing-tools",
+    "parallel-tests",
+    "parallel-testing",
+    "cypress"
+  ],
+  "license": "MIT",
   "dependencies": {
     "fast-glob": "^3.2.5",
     "minimatch": "^3.0.4",

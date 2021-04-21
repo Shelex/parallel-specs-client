@@ -1,6 +1,7 @@
 const { SplitTestClient, filesToSpecInput } = require("../index");
 
-const client = new SplitTestClient({ project: "testing" });
+// pass credentials and project
+const client = new SplitTestClient({ project: "test", username: "admin", password: "admin" });
 
 // get all specs but ignore spec8
 const specs = filesToSpecInput(["**/specs/*.js"], ["**/spec8.js"]);
@@ -11,15 +12,7 @@ function getRandomDuration() {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-console.log(client.options)
-// get project info
-const projectResponse = client.project();
-const { project } = projectResponse.data;
-// output latest session (previous one)
-console.log(
-  project.sessions.find((session) => session.id === project.latestSession)
-);
-
+// create new session
 client.addSession(specs);
 
 let iterator = 0;
@@ -27,9 +20,9 @@ let iterator = 0;
 function AskNextSpec() {
   setTimeout(function () {
     const next = client.nextSpec(getRandomDuration() >= 4 ? 'runner1' : 'runner2');
-    if (!next.errors) {
+    if (next) {
       console.log(
-        `${Date.now().toLocaleString()} running spec ${next.data.nextSpec}`
+        `${Date.now()} running spec ${next}`
       );
     }
     iterator++;

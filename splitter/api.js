@@ -1,5 +1,20 @@
 const fetch = require("sync-fetch");
 
+const loginQuery = (username, password) => ({
+  query: `
+            mutation login($user: User!) {
+              login(input: $user)
+            }
+            `,
+  variables: {
+    user: {
+      username: username,
+      password: password,
+    },
+  },
+  operationName: "login",
+});
+
 const projectQuery = (name) => ({
   query: `
           query project($name: String!) {
@@ -58,34 +73,32 @@ const nextSpecQuery = (sessionID, machineID) => ({
   operationName: "nextSpec",
 });
 
-const projectInfo = (opts, name) =>
+const defaultHeader = {
+  "Content-Type": "application/json",
+};
+
+const header = (opts) =>
+  opts.token
+    ? { ...defaultHeader, ...{ Authorization: opts.token } }
+    : defaultHeader;
+
+const jqlRequest = (opts, query) =>
   fetch(opts.url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(projectQuery(name)),
+    headers: header(opts),
+    body: JSON.stringify(query),
   }).json();
 
+const login = (opts) =>
+  jqlRequest(opts, loginQuery(opts.username, opts.password));
+const projectInfo = (opts, name) => jqlRequest(opts, projectQuery(name));
 const createSession = (opts, projectName, specs) =>
-  fetch(opts.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(addSessionQuery(projectName, specs)),
-  }).json();
-
+  jqlRequest(opts, addSessionQuery(projectName, specs));
 const nextSpec = (opts, sessionID, machineID) =>
-  fetch(opts.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(nextSpecQuery(sessionID, machineID)),
-  }).json();
+  jqlRequest(opts, nextSpecQuery(sessionID, machineID));
 
 module.exports = {
+  login,
   projectInfo,
   createSession,
   nextSpec,

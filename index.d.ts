@@ -1,13 +1,11 @@
 import { Pattern } from "fast-glob";
-
 interface SplitterOptions {
   url?: string;
   project?: string;
+  token?: string;
+  username?: string;
+  password?: string;
 }
-
-type gqlError = {
-  message: string;
-};
 
 type Spec = {
   file: string;
@@ -23,36 +21,19 @@ type Session = {
   backlog: Spec[];
 };
 
-type ProjectResponse = {
-  data?: {
-    project: {
-      projectName: string;
-      latestSession: string;
-      sessions: Session[];
-    };
-  };
-  errors?: gqlError[];
+type Project = {
+  projectName: string;
+  latestSession: string;
+  sessions: Session[];
 };
 
-type CreateSessionResponse = {
-  data?: {
-    addSession: {
-      sessionId: string;
-      projectName: string;
-    };
-  };
-  errors?: gqlError[];
+type AddSessionResponse = {
+  projectName: string;
+  sessionId: string;
 };
 
 type SpecInput = {
   filePath: string;
-}
-
-type NextSpecResponse = {
-  data?: {
-    nextSpec: string;
-  };
-  errors?: gqlError[];
 };
 
 declare class SplitterClient {
@@ -60,14 +41,14 @@ declare class SplitterClient {
 
   constructor(options?: SplitterOptions);
 
-  project(name?: string): ProjectResponse;
-  nextSpec(machineId?: string, sessionId?: string): NextSpecResponse;
-  addSession(specs: SpecInput[], projectName?: string): CreateSessionResponse;
+  project(name?: string): Project;
+  nextSpec(machineId?: string, sessionId?: string): string;
+  addSession(specs: SpecInput[], projectName?: string): AddSessionResponse;
 }
 
 type SplitSpecs = {
-  SplitterClient: SplitterClient,
+  SplitterClient: SplitterClient;
   filesToSpecInput(includes: Pattern[], exludes: Pattern[]): SpecInput[];
-}
+};
 
-export = SplitSpecs
+export = SplitSpecs;
