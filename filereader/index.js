@@ -1,7 +1,7 @@
 const glob = require('fast-glob');
 const minimatch = require('minimatch');
 
-const findSpecFiles = (includes, excludes) => {
+const findSpecFiles = (includes = [], excludes = []) => {
     const files = includes.reduce((files, pattern) => {
         const patternFiles = glob.sync(pattern, {
             onlyFiles: true,

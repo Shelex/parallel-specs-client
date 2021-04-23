@@ -1,6 +1,6 @@
 const split = require("./api");
 
-class SplitTestClient {
+class SpecSplitClient {
   options = {
     url: "http://split-specs.appspot.com/query",
     project: null,
@@ -52,4 +52,4 @@ class SplitTestClient {
   }
 }
 
-module.exports = SplitTestClient;
+module.exports = SpecSplitClient;

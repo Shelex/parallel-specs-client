@@ -1,7 +1,7 @@
-const SplitTestClient = require("./splitter");
+const SpecSplitClient = require("./splitter");
 const filesToSpecInput = require("./filereader");
 
 module.exports = {
-  SplitTestClient,
+  SpecSplitClient,
   filesToSpecInput,
 };

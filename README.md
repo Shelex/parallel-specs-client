@@ -25,10 +25,10 @@ npm install @shelex/split-specs-client
 ## Example
 
 ```js
-import { SplitTestClient, filesToSpecInput } from '@shelex/split-specs-client';
-// const { SplitTestClient, filesToSpecInput } = require("@shelex/split-specs-client")
+import { SpecSplitClient, filesToSpecInput } from '@shelex/split-specs-client';
+// const { SpecSplitClient, filesToSpecInput } = require("@shelex/split-specs-client")
 
-const client = new SplitTestClient({ 
+const client = new SpecSplitClient({ 
     project: "test", 
     username: "admin", 
     password: "admin" 
@@ -75,7 +75,7 @@ More documentation regarding available API is in [split-specs](https://github.co
 
 ## API
 
-### `const client = new SplitTestClient({options})`
+### `const client = new SpecSplitClient({options})`
 
 Constructor. `options` may contain inital values for:
 

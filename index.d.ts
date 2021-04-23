@@ -36,7 +36,7 @@ type SpecInput = {
   filePath: string;
 };
 
-declare class SplitterClient {
+export class SpecSplitClient {
   readonly options: SplitterOptions;
 
   constructor(options?: SplitterOptions);
@@ -46,9 +46,4 @@ declare class SplitterClient {
   addSession(specs: SpecInput[], projectName?: string): AddSessionResponse;
 }
 
-type SplitSpecs = {
-  SplitterClient: SplitterClient;
-  filesToSpecInput(includes: Pattern[], exludes: Pattern[]): SpecInput[];
-};
-
-export = SplitSpecs;
+export function filesToSpecInput(includes: Pattern[], exludes: Pattern[]): SpecInput[]
