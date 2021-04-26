@@ -1,40 +1,60 @@
-const { SplitTestClient, filesToSpecInput } = require("../index");
+#!/usr/bin/env node
+const { SpecSplitClient, filesToSpecInput } = require("../index");
+const { spawn } = require("child_process");
+
+// get number of executors, command and arguments
+const [executors, cmd, ...args] = process.argv.slice(2);
 
 // pass credentials and project
-const client = new SplitTestClient({ project: "test", username: "admin", password: "admin" });
+const client = new SpecSplitClient({ project: "test", username: "admin", password: "admin" });
 
 // get all specs but ignore spec8
 const specs = filesToSpecInput(["**/specs/*.js"], ["**/spec8.js"]);
 
-function getRandomDuration() {
-  const min = 1;
-  const max = 7;
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
 // create new session
 client.addSession(specs);
 
-let iterator = 0;
+let exitCode = 0;
 
-function AskNextSpec() {
-  setTimeout(function () {
-    const next = client.nextSpec(getRandomDuration() >= 4 ? 'runner1' : 'runner2');
-    if (next) {
-      console.log(
-        `${Date.now()} running spec ${next}`
-      );
-    }
-    iterator++;
-    // we should ask one more time after last spec to let service know that it is finished
-    if (iterator <= specs.length) {
-        AskNextSpec();
-    }
-  }, getRandomDuration() * 1000);
+function next(machineID) {
+  const nextSpec = client.nextSpec(machineID);
+  if (nextSpec) {
+    process.stdout.write(`PICKING UP NEXT TASK (${nextSpec}) for machine ${machineID}\n`);
+
+    return new Promise((resolve, reject) => {
+      const arg = [...args, "--spec", nextSpec];
+      const child_process = spawn(cmd, arg);
+
+      child_process.on("exit", (code) => {
+        return resolve(() => {
+          exitCode += code;
+        });
+      });
+      child_process.on("error", (err) => {
+        return reject(err);
+      });
+    });
+  } else {
+    return Promise.reject(`ALL SPECS PROCESSED for ${machineID}\n`);
+  }
 }
 
-AskNextSpec();
+const executor = (machineID) => {
+  return new Promise((resolve) => {
+    resolve(
+      (function recursive() {
+        next(machineID)
+          .then(recursive)
+          .catch((e) => console.log(e));
+      })()
+    );
+  });
+};
 
-// ensure specs for runner1 and runner2 stopped:
-client.nextSpec('runner1')
-client.nextSpec('runner2')
+const runners = Array.from({ length: executors }, (_, v) => executor(`machine${v + 1}`));
+
+Promise.all(runners);
+
+process.on("exit", () => {
+  process.exit(exitCode);
+});

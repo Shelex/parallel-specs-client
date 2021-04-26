@@ -5,7 +5,8 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "node examples/test.js"
+    "cy:run": "npx cypress run",
+    "test": "node examples/test.js 2 npm run cy:run"
   },
   "author": {
     "name": "Oleksandr Shevtsov",
