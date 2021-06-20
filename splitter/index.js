@@ -6,7 +6,7 @@ class SpecSplitClient {
     project: null,
     sessionId: null,
     token: null,
-    username: null,
+    email: null,
     password: null,
   };
 

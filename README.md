@@ -6,17 +6,17 @@
 [![License][license-image]][license-url]
 
 API Client library for [Split specs](https://github.com/Shelex/split-specs).  
-Service could be used as orchestrator for your spec files during parallel testing across different machines/containers.  
+Service could be used as orchestrator for your spec files during parallel testing across different machines/containers.
 
 ## Install
 
--   yarn:
+- yarn:
 
 ```bash
 yarn add @shelex/split-specs-client
 ```
 
--   npm:
+- npm:
 
 ```bash
 npm install @shelex/split-specs-client
@@ -25,20 +25,20 @@ npm install @shelex/split-specs-client
 ## Example
 
 ```js
-import { SpecSplitClient, filesToSpecInput } from '@shelex/split-specs-client';
+import { SpecSplitClient, filesToSpecInput } from "@shelex/split-specs-client";
 // const { SpecSplitClient, filesToSpecInput } = require("@shelex/split-specs-client")
 
-const client = new SpecSplitClient({ 
-    project: "test", 
-    username: "admin", 
-    password: "admin" 
+const client = new SpecSplitClient({
+  project: "test",
+  email: "admin@example.com",
+  password: "admin",
 });
 
 /**
  * specs are located in folder "specs"
  * files: "spec1.js", "spec2.js", "spec3.js", "spec5.js", "spec4.js"
  * take all js files in "specs" folder excepting "spec5.js"
-*/
+ */
 const specs = filesToSpecInput(["**/specs/*.js"], ["**/specs/spec5.js"]);
 
 // create new session (project will be created automatically, or link existing)
@@ -48,29 +48,29 @@ client.addSession(specs);
 // client.addSession(specs)
 
 // query next spec for any of your runners
-const next = client.nextSpec('runner1'); // start spec1, return spec1
-const next = client.nextSpec('runner2'); // start spec2, return spec2
-const next = client.nextSpec('runner2'); // finish spec2, start spec3, return spec3
-const next = client.nextSpec('runner1'); // finish spec1, start spec4, return spec4
-const next = client.nextSpec('runner2'); // finish spec3, return null
-const next = client.nextSpec('runner1'); // finish spec4, return null
+const next = client.nextSpec("runner1"); // start spec1, return spec1
+const next = client.nextSpec("runner2"); // start spec2, return spec2
+const next = client.nextSpec("runner2"); // finish spec2, start spec3, return spec3
+const next = client.nextSpec("runner1"); // finish spec1, start spec4, return spec4
+const next = client.nextSpec("runner2"); // finish spec3, return null
+const next = client.nextSpec("runner1"); // finish spec4, return null
 
 // get current state of project "test"
-const project = client.project()
-console.log(project)
+const project = client.project();
+console.log(project);
 ```
 
 ## Registration
+
 You can register your account at [split-specs playground](http://split-specs.appspot.com/playground)
 by executing query:
+
 ```gql
-mutation{
-  register(input: {
-    username: "username",
-    password: "password"
-  })
+mutation {
+  register(input: { email: "email@example.com", password: "password" })
 }
 ```
+
 More documentation regarding available API is in [split-specs](https://github.com/Shelex/split-specs) repository.
 
 ## API
@@ -79,20 +79,20 @@ More documentation regarding available API is in [split-specs](https://github.co
 
 Constructor. `options` may contain inital values for:
 
--   `url`, default: "http://split-specs.appspot.com/query"; url for split-specs service queries
--   `project`, may be also passed as second argument to `addSession`
--   `token`, in case you have obtained token in web version (valid for 24h) or other way, it could be passed so login step will be skipped
--   `username` and `password`, in case token option is empty, constructor will call login method with this credentials to obtain token
+- `url`, default: "http://split-specs.appspot.com/query"; url for split-specs service queries
+- `project`, may be also passed as second argument to `addSession`
+- `token`, in case you have obtained token in web version (valid for 24h) or other way, it could be passed so login step will be skipped
+- `email` and `password`, in case token option is empty, constructor will call login method with this credentials to obtain token
 
 ### `client.addSession(specs: SpecInput[], projectName?: string): {sessionId: string}`
 
 Create a new session for project. Project will be reused, or created in case it still not exist.  
-Returns object with property sessionID that could be used for retrieving spec.  
+Returns object with property sessionID that could be used for retrieving spec.
 
 ### `client.nextSpec(machineId?: string, sessionId?: string): string;`
 
 Get next spec for machineId + sessionId, returns spec filePath.  
-Ends previous spec for this machineId + sessionId in case it exists.  
+Ends previous spec for this machineId + sessionId in case it exists.
 
 ### `project(name?: string): Project`
 
@@ -101,7 +101,7 @@ Get project details with all sessions conducted
 ## Motivation
 
 Idea is to have separate service for orchestrating specs during test runs. Classical solution is to manually split spec files in groups, however it may be not so efficient in terms of run duration. Strategy used in this service is basically to run new specs and then from longest to shortest compared to previous session.  
-Potentially, some UI could be built on top of [Split specs](https://github.com/Shelex/split-specs) service to track test sessions across the time.  
+Potentially, some UI could be built on top of [Split specs](https://github.com/Shelex/split-specs) service to track test sessions across the time.
 
 ## License
 

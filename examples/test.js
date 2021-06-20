@@ -6,7 +6,11 @@ const { spawn } = require("child_process");
 const [executors, cmd, ...args] = process.argv.slice(2);
 
 // pass credentials and project
-const client = new SpecSplitClient({ project: "test", username: "admin", password: "admin" });
+const client = new SpecSplitClient({
+  project: "test",
+  email: "admin@xample.com",
+  password: "admin",
+});
 
 // get all specs but ignore spec8
 const specs = filesToSpecInput(["**/specs/*.js"], ["**/spec8.js"]);
@@ -19,7 +23,9 @@ let exitCode = 0;
 function next(machineID) {
   const nextSpec = client.nextSpec(machineID);
   if (nextSpec) {
-    process.stdout.write(`PICKING UP NEXT TASK (${nextSpec}) for machine ${machineID}\n`);
+    process.stdout.write(
+      `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineID}\n`
+    );
 
     return new Promise((resolve, reject) => {
       const arg = [...args, "--spec", nextSpec];
@@ -51,7 +57,9 @@ const executor = (machineID) => {
   });
 };
 
-const runners = Array.from({ length: executors }, (_, v) => executor(`machine${v + 1}`));
+const runners = Array.from({ length: executors }, (_, v) =>
+  executor(`machine${v + 1}`)
+);
 
 Promise.all(runners);
 

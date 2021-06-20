@@ -1,6 +1,6 @@
 const fetch = require("sync-fetch");
 
-const loginQuery = (username, password) => ({
+const loginQuery = (email, password) => ({
   query: `
             mutation login($user: User!) {
               login(input: $user)
@@ -8,7 +8,7 @@ const loginQuery = (username, password) => ({
             `,
   variables: {
     user: {
-      username: username,
+      email: email,
       password: password,
     },
   },
@@ -89,8 +89,7 @@ const jqlRequest = (opts, query) =>
     body: JSON.stringify(query),
   }).json();
 
-const login = (opts) =>
-  jqlRequest(opts, loginQuery(opts.username, opts.password));
+const login = (opts) => jqlRequest(opts, loginQuery(opts.email, opts.password));
 const projectInfo = (opts, name) => jqlRequest(opts, projectQuery(name));
 const createSession = (opts, projectName, specs) =>
   jqlRequest(opts, addSessionQuery(projectName, specs));

@@ -3,7 +3,7 @@ interface SplitterOptions {
   url?: string;
   project?: string;
   token?: string;
-  username?: string;
+  email?: string;
   password?: string;
 }
 
@@ -46,4 +46,7 @@ export class SpecSplitClient {
   addSession(specs: SpecInput[], projectName?: string): AddSessionResponse;
 }
 
-export function filesToSpecInput(includes: Pattern[], exludes: Pattern[]): SpecInput[]
+export function filesToSpecInput(
+  includes: Pattern[],
+  exludes: Pattern[]
+): SpecInput[];
