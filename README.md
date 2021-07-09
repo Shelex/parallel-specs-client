@@ -48,12 +48,12 @@ client.addSession(specs);
 // client.addSession(specs)
 
 // query next spec for any of your runners
-const next = client.nextSpec("runner1"); // start spec1, return spec1
-const next = client.nextSpec("runner2"); // start spec2, return spec2
-const next = client.nextSpec("runner2"); // finish spec2, start spec3, return spec3
-const next = client.nextSpec("runner1"); // finish spec1, start spec4, return spec4
-const next = client.nextSpec("runner2"); // finish spec3, return null
-const next = client.nextSpec("runner1"); // finish spec4, return null
+const next = client.nextSpec({ machineId: "runner1" }); // start spec1, return spec1
+const next = client.nextSpec({ machineId: "runner2" }); // start spec2, return spec2
+const next = client.nextSpec({ machineId: "runner2" }); // finish spec2, start spec3, return spec3
+const next = client.nextSpec({ machineId: "runner1" }); // finish spec1, start spec4, return spec4
+const next = client.nextSpec({ machineId: "runner2" }); // finish spec3, return null
+const next = client.nextSpec({ machineId: "runner1" }); // finish spec4, return null
 
 // get current state of project "test"
 const project = client.project();
