@@ -27,6 +27,7 @@ const projectQuery = (name) => ({
                         end
                         backlog {
                           file
+                          passed
                           estimatedDuration
                           start
                           end
@@ -60,15 +61,18 @@ const addSessionQuery = (projectName, specs) => ({
   operationName: "addSession",
 });
 
-const nextSpecQuery = (sessionID, machineID) => ({
+const nextSpecQuery = (opts) => ({
   query: `
-          query nextSpec($sessionId: String!, $machineId: String) {
-              nextSpec(sessionId: $sessionId, machineId: $machineId)
+          query nextSpec($sessionId: String!, $options: NextOptions) {
+              nextSpec(sessionId: $sessionId, options: $options)
               }
             `,
   variables: {
-    sessionId: sessionID,
-    machineId: machineID,
+    sessionId: opts.sessionId,
+    options: {
+      machineId: opts.machineId,
+      previousPassed: opts.isPassed,
+    },
   },
   operationName: "nextSpec",
 });
@@ -93,8 +97,8 @@ const login = (opts) => jqlRequest(opts, loginQuery(opts.email, opts.password));
 const projectInfo = (opts, name) => jqlRequest(opts, projectQuery(name));
 const createSession = (opts, projectName, specs) =>
   jqlRequest(opts, addSessionQuery(projectName, specs));
-const nextSpec = (opts, sessionID, machineID) =>
-  jqlRequest(opts, nextSpecQuery(sessionID, machineID));
+const nextSpec = (opts, nextOptions) =>
+  jqlRequest(opts, nextSpecQuery(nextOptions));
 
 module.exports = {
   login,

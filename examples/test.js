@@ -8,7 +8,7 @@ const [executors, cmd, ...args] = process.argv.slice(2);
 // pass credentials and project
 const client = new SpecSplitClient({
   project: "test",
-  email: "admin@xample.com",
+  email: "admin@example.com",
   password: "admin",
 });
 
@@ -21,7 +21,9 @@ client.addSession(specs);
 let exitCode = 0;
 
 function next(machineID) {
-  const nextSpec = client.nextSpec(machineID);
+  const nextSpec = client.nextSpec({
+    machineId: machineID,
+  });
   if (nextSpec) {
     process.stdout.write(
       `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineID}\n`

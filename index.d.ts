@@ -10,6 +10,7 @@ interface SplitterOptions {
 type Spec = {
   file: string;
   estimatedDuration: number;
+  passed: boolean;
   start: number;
   end: number;
 };
@@ -36,13 +37,19 @@ type SpecInput = {
   filePath: string;
 };
 
+type NextSpecOptions = {
+  sessionId?: string;
+  machineId?: string;
+  isPassed?: boolean;
+};
+
 export class SpecSplitClient {
   readonly options: SplitterOptions;
 
   constructor(options?: SplitterOptions);
 
   project(name?: string): Project;
-  nextSpec(machineId?: string, sessionId?: string): string;
+  nextSpec(options?: NextSpecOptions): string;
   addSession(specs: SpecInput[], projectName?: string): AddSessionResponse;
 }
 

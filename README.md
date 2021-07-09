@@ -89,7 +89,7 @@ Constructor. `options` may contain inital values for:
 Create a new session for project. Project will be reused, or created in case it still not exist.  
 Returns object with property sessionID that could be used for retrieving spec.
 
-### `client.nextSpec(machineId?: string, sessionId?: string): string;`
+### `client.nextSpec({ machineId?: string, sessionId?: string, isPassed?: boolean }): string;`
 
 Get next spec for machineId + sessionId, returns spec filePath.  
 Ends previous spec for this machineId + sessionId in case it exists.

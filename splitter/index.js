@@ -29,10 +29,18 @@ class SpecSplitClient {
     return res.data.project;
   }
 
-  nextSpec(machineId = "default", sessionId = this.options.sessionId) {
-    const res = split.nextSpec(this.options, sessionId, machineId);
+  nextSpec(nextOptions = {}) {
+    nextOptions = Object.assign(
+      {
+        machineId: "default",
+        sessionId: this.options.sessionId,
+        isPassed: false,
+      },
+      nextOptions
+    );
+    const res = split.nextSpec(this.options, nextOptions);
     if (res.errors) {
-      if (res.errors[0].message === "session finished") {
+      if (res.errors[0].message.includes("finished")) {
         return null;
       }
       throw new Error(res.errors[0].message);
