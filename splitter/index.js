@@ -2,7 +2,7 @@ const split = require("./api");
 
 class SpecSplitClient {
   options = {
-    url: "http://split-specs.appspot.com/query",
+    url: "https://split-specs.appspot.com/query",
     project: null,
     sessionId: null,
     token: null,
