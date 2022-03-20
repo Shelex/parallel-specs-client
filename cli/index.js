@@ -1,8 +1,9 @@
+#!/usr/bin/env node
 const { Option, Command, InvalidOptionArgumentError } = require('commander');
 const SplitSpecClient = require('../splitter');
 const readSpecFiles = require('../filereader');
 const fs = require('fs');
-const { parseGlobPatterns, readCyConfig } = require('./checkCyConfig');
+const { readCyConfig } = require('./checkCyConfig');
 
 const program = new Command();
 
