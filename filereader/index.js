@@ -7,18 +7,24 @@ const findSpecFiles = (includes = [], excludes = []) => {
             onlyFiles: true,
             suppressErrors: true,
             ignore: '**/node_modules/**'
-          });
-        files.push(...patternFiles)
-        return files
-    }, [])
+        });
+        files.push(...patternFiles);
+        return files;
+    }, []);
 
-    const uniqueFilesSet = new Set(files)
+    const uniqueFilesSet = new Set(files);
 
-    const uniqueFiles = Array.from(uniqueFilesSet)
+    const uniqueFiles = Array.from(uniqueFilesSet);
 
-    return uniqueFiles.filter(file => !excludes.some(exclude => minimatch(file, exclude, {matchBase: true})))
-}
+    return uniqueFiles.filter(
+        (file) =>
+            !excludes.some((exclude) =>
+                minimatch(file, exclude, { matchBase: true })
+            )
+    );
+};
 
-const filesToSpecInput = (includes, excludes) => findSpecFiles(includes, excludes).map(file => ({filePath: file}))
+const filesToSpecInput = (includes, excludes) =>
+    findSpecFiles(includes, excludes).map((file) => ({ filePath: file }));
 
-module.exports = filesToSpecInput
+module.exports = filesToSpecInput;

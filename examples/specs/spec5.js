@@ -1,5 +1,5 @@
 describe('suite', () => {
     it('should pass', () => {
-        cy.wrap(true).should('be.eq', true)
-    })
-})
+        cy.wrap(true).should('be.eq', true);
+    });
+});

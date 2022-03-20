@@ -1,22 +1,22 @@
-const fetch = require("sync-fetch");
+const fetch = require('sync-fetch');
 
 const loginQuery = (email, password) => ({
-  query: `
+    query: `
             mutation login($user: User!) {
               login(input: $user)
             }
             `,
-  variables: {
-    user: {
-      email: email,
-      password: password,
+    variables: {
+        user: {
+            email: email,
+            password: password
+        }
     },
-  },
-  operationName: "login",
+    operationName: 'login'
 });
 
 const projectQuery = (name) => ({
-  query: `
+    query: `
           query project($name: String!) {
                   project(name: $name) {
                       projectName
@@ -37,14 +37,14 @@ const projectQuery = (name) => ({
                     }
               }
             `,
-  variables: {
-    name: name,
-  },
-  operationName: "project",
+    variables: {
+        name: name
+    },
+    operationName: 'project'
 });
 
 const addSessionQuery = (projectName, specs) => ({
-  query: `
+    query: `
           mutation addSession($session: SessionInput!) {
               addSession(session: $session) {
                   sessionId
@@ -52,57 +52,71 @@ const addSessionQuery = (projectName, specs) => ({
                     }
               }
             `,
-  variables: {
-    session: {
-      projectName: projectName,
-      specFiles: specs,
+    variables: {
+        session: {
+            projectName: projectName,
+            specFiles: specs
+        }
     },
-  },
-  operationName: "addSession",
+    operationName: 'addSession'
 });
 
 const nextSpecQuery = (opts) => ({
-  query: `
+    query: `
           query nextSpec($sessionId: String!, $options: NextOptions) {
               nextSpec(sessionId: $sessionId, options: $options)
               }
             `,
-  variables: {
-    sessionId: opts.sessionId,
-    options: {
-      machineId: opts.machineId,
-      previousPassed: opts.isPassed,
+    variables: {
+        sessionId: opts.sessionId,
+        options: {
+            machineId: opts.machineId,
+            previousPassed: opts.isPassed
+        }
     },
-  },
-  operationName: "nextSpec",
+    operationName: 'nextSpec'
 });
 
 const defaultHeader = {
-  "Content-Type": "application/json",
+    'Content-Type': 'application/json'
 };
 
 const header = (opts) =>
-  opts.token
-    ? { ...defaultHeader, ...{ Authorization: opts.token } }
-    : defaultHeader;
+    opts.token
+        ? { ...defaultHeader, ...{ Authorization: opts.token } }
+        : defaultHeader;
 
-const jqlRequest = (opts, query) =>
-  fetch(opts.url, {
-    method: "POST",
-    headers: header(opts),
-    body: JSON.stringify(query),
-  }).json();
+const jqlRequest = (opts, query) => {
+    const res = fetch(opts.url, {
+        method: 'POST',
+        headers: header(opts),
+        body: JSON.stringify(query)
+    });
+    const resBody = res.text();
+
+    try {
+        return JSON.parse(resBody);
+    } catch (_) {
+        return {
+            errors: [
+                {
+                    message: resBody
+                }
+            ]
+        };
+    }
+};
 
 const login = (opts) => jqlRequest(opts, loginQuery(opts.email, opts.password));
 const projectInfo = (opts, name) => jqlRequest(opts, projectQuery(name));
 const createSession = (opts, projectName, specs) =>
-  jqlRequest(opts, addSessionQuery(projectName, specs));
+    jqlRequest(opts, addSessionQuery(projectName, specs));
 const nextSpec = (opts, nextOptions) =>
-  jqlRequest(opts, nextSpecQuery(nextOptions));
+    jqlRequest(opts, nextSpecQuery(nextOptions));
 
 module.exports = {
-  login,
-  projectInfo,
-  createSession,
-  nextSpec,
+    login,
+    projectInfo,
+    createSession,
+    nextSpec
 };
