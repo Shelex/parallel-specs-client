@@ -47,7 +47,6 @@ program
         ).default(false)
     )
     .action((options) => {
-        console.log(options);
         if (!options.password && !options.token && !options.email) {
             throw new InvalidOptionArgumentError(
                 `required options '--token [string]' OR '--email [string] --password [string]' not specified`

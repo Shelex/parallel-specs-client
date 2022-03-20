@@ -47,7 +47,6 @@ class SpecSplitClient {
     addSession(specs, projectName = this.options.project) {
         const res = split.createSession(this.options, projectName, specs);
         handleError(res);
-        console.log(res);
         if (res && res.data && res.data && res.data.addSession) {
             this.options.sessionId = res.data.addSession.sessionId;
         }
