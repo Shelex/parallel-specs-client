@@ -10,13 +10,13 @@ Service could be used as orchestrator for your spec files during parallel testin
 
 ## Install
 
-- yarn:
+-   yarn:
 
 ```bash
 yarn add @shelex/split-specs-client
 ```
 
-- npm:
+-   npm:
 
 ```bash
 npm install @shelex/split-specs-client
@@ -25,13 +25,13 @@ npm install @shelex/split-specs-client
 ## Example
 
 ```js
-import { SpecSplitClient, filesToSpecInput } from "@shelex/split-specs-client";
+import { SpecSplitClient, filesToSpecInput } from '@shelex/split-specs-client';
 // const { SpecSplitClient, filesToSpecInput } = require("@shelex/split-specs-client")
 
 const client = new SpecSplitClient({
-  project: "test",
-  email: "admin@example.com",
-  password: "admin",
+    project: 'test',
+    email: 'admin@example.com',
+    password: 'admin'
 });
 
 /**
@@ -39,7 +39,7 @@ const client = new SpecSplitClient({
  * files: "spec1.js", "spec2.js", "spec3.js", "spec5.js", "spec4.js"
  * take all js files in "specs" folder excepting "spec5.js"
  */
-const specs = filesToSpecInput(["**/specs/*.js"], ["**/specs/spec5.js"]);
+const specs = filesToSpecInput(['**/specs/*.js'], ['**/specs/spec5.js']);
 
 // create new session (project will be created automatically, or link existing)
 client.addSession(specs);
@@ -48,16 +48,41 @@ client.addSession(specs);
 // client.addSession(specs)
 
 // query next spec for any of your runners
-const next = client.nextSpec({ machineId: "runner1" }); // start spec1, return spec1
-const next = client.nextSpec({ machineId: "runner2" }); // start spec2, return spec2
-const next = client.nextSpec({ machineId: "runner2" }); // finish spec2, start spec3, return spec3
-const next = client.nextSpec({ machineId: "runner1" }); // finish spec1, start spec4, return spec4
-const next = client.nextSpec({ machineId: "runner2" }); // finish spec3, return null
-const next = client.nextSpec({ machineId: "runner1" }); // finish spec4, return null
+const next = client.nextSpec({ machineId: 'runner1' }); // start spec1, return spec1
+const next = client.nextSpec({ machineId: 'runner2' }); // start spec2, return spec2
+const next = client.nextSpec({ machineId: 'runner2' }); // finish spec2, start spec3, return spec3
+const next = client.nextSpec({ machineId: 'runner1' }); // finish spec1, start spec4, return spec4
+const next = client.nextSpec({ machineId: 'runner2' }); // finish spec3, return null
+const next = client.nextSpec({ machineId: 'runner1' }); // finish spec4, return null
 
 // get current state of project "test"
 const project = client.project();
 console.log(project);
+```
+
+## Example with cypress
+
+```
+import { runCypress } from '@shelex/split-specs-client';
+
+runCypress(
+    {
+        machineId: process.env.SPLIT_TEST_MACHINE_ID || 'default',
+        project: process.env.SPLIT_TEST_PROJECT_NAME,
+        token: process.env.SPLIT_TEST_API_KEY,
+        sessionId: process.env.SPLIT_TEST_SESSION_ID
+    },
+    {
+        browser: 'chrome',
+        config: {
+            video: false
+        },
+        env: {
+            allure: true
+        }
+    }
+);
+
 ```
 
 ## Registration
@@ -67,7 +92,7 @@ by executing query:
 
 ```gql
 mutation {
-  register(input: { email: "email@example.com", password: "password" })
+    register(input: { email: "email@example.com", password: "password" })
 }
 ```
 
@@ -79,10 +104,10 @@ More documentation regarding available API is in [split-specs](https://github.co
 
 Constructor. `options` may contain inital values for:
 
-- `url`, default: "http://split-specs.appspot.com/query"; url for split-specs service queries
-- `project`, may be also passed as second argument to `addSession`
-- `token`, in case you have obtained token in web version (valid for 24h) or other way, it could be passed so login step will be skipped
-- `email` and `password`, in case token option is empty, constructor will call login method with this credentials to obtain token
+-   `url`, default: "http://split-specs.appspot.com/query"; url for split-specs service queries
+-   `project`, may be also passed as second argument to `addSession`
+-   `token`, in case you have obtained token in web version (valid for 24h) or other way, it could be passed so login step will be skipped
+-   `email` and `password`, in case token option is empty, constructor will call login method with this credentials to obtain token
 
 ### `client.addSession(specs: SpecInput[], projectName?: string): {sessionId: string}`
 
@@ -97,6 +122,21 @@ Ends previous spec for this machineId + sessionId in case it exists.
 ### `project(name?: string): Project`
 
 Get project details with all sessions conducted
+
+## CLI
+
+Library also provides with CLI to create session, example:
+
+```
+split-specs-cli create-session --project test --token $split_spec_token --include-specs '**/cypress/integration/**'
+```
+
+Use `split-specs-cli create-session --help` to check arguments available  
+Created session will be stored as json file or just `console.log` session id to catch from bash:
+
+```
+SPLIT_SPEC_SESSION_ID=$(split-spec-cli create-session (args for split spec client) | tail -1)
+```
 
 ## Motivation
 
