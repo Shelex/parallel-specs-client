@@ -1,4 +1,4 @@
-const SplitSpecClient = require('../splitter');
+const SpecSplitClient = require('../splitter');
 
 const RunCypress = (splitSpecInfo, cypressConfig, configFn) => {
     const cypress = require('cypress');
