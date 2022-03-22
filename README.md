@@ -60,9 +60,29 @@ const project = client.project();
 console.log(project);
 ```
 
-## Example with cypress
+## CLI
+
+Library also provides with CLI to create session, example:
 
 ```
+split-specs-cli create-session --project test --token $split_spec_token --include-specs '**/cypress/integration/**'
+```
+
+Use `split-specs-cli create-session --help` to check arguments available  
+Created session will be stored as json file or just `console.log` session id to catch from bash:
+
+```
+SPLIT_SPEC_SESSION_ID=$(split-spec-cli create-session (args for split spec client) | tail -1)
+```
+
+## Example with cypress
+
+`split-specs-client` also exports function `runCypress`, which will handle split-specs service interaction for you and execute cypress.  
+Signature: `runCypress`(`SplitSpecsArguments` object, `Cypress config` object, optional `function(Cypress Config, spec name): Cypress Config`)  
+Just add your information to env variables (machineId, project name, split-specs api key or account details, sessionId) and create a similar script:
+
+```js
+// runner.js
 import { runCypress } from '@shelex/split-specs-client';
 
 runCypress(
@@ -82,12 +102,14 @@ runCypress(
         }
     }
 );
-
 ```
+
+and then use it just by calling `node runner.js`.
+You can have multiple machines\actions\containers with such runner (with different machineId) and each runner will ask service for next spec file to execute.
 
 ## Registration
 
-You can register your account at [split-specs playground](http://split-specs.appspot.com/playground)
+You can register your account at [split-specs UI](http://split-specs.appspot.com)
 by executing query:
 
 ```gql
@@ -122,21 +144,6 @@ Ends previous spec for this machineId + sessionId in case it exists.
 ### `project(name?: string): Project`
 
 Get project details with all sessions conducted
-
-## CLI
-
-Library also provides with CLI to create session, example:
-
-```
-split-specs-cli create-session --project test --token $split_spec_token --include-specs '**/cypress/integration/**'
-```
-
-Use `split-specs-cli create-session --help` to check arguments available  
-Created session will be stored as json file or just `console.log` session id to catch from bash:
-
-```
-SPLIT_SPEC_SESSION_ID=$(split-spec-cli create-session (args for split spec client) | tail -1)
-```
 
 ## Motivation
 
