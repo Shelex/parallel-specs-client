@@ -54,18 +54,21 @@ const RunCypress = (splitSpecInfo, cypressConfig, configFn) => {
     }
 
     // execute cypress run recursively taking next test from existing files
-    Promise.resolve(
-        (function recursive() {
-            next(machineId)
-                .then(recursive)
-                .catch((e) => console.log(e));
-        })()
-    );
+    (function recursive() {
+        next(machineId)
+            .then(recursive)
+            .catch((e) => console.log(e))
+            .finally(() => {
+                if (process.exitCode || 0 > 0) {
+                    throw new Error(
+                        `Test runner process exit with code ${process.exitCode}`
+                    );
+                }
+                console.log(
+                    `Test runner process exit with code ${process.exitCode}`
+                );
+            });
+    })();
 };
-
-// throw an exit code
-process.on('exit', (code) => {
-    console.log(`Test runner process exit with code ${code}`);
-});
 
 module.exports = RunCypress;
