@@ -62,11 +62,11 @@ console.log(project);
 
 ## CLI
 
-Library also provides with CLI to create session, example:
+Library also provides CLI interface
 
-```
-split-specs-cli create-session --project test --token $split_spec_token --include-specs '**/cypress/integration/**'
-```
+### Create session
+
+`split-specs-cli create-session --project test --token $split_spec_token --include-specs '**/cypress/integration/**'`
 
 Use `split-specs-cli create-session --help` to check arguments available  
 Created session will be stored as json file or just `console.log` session id to catch from bash:
@@ -75,37 +75,17 @@ Created session will be stored as json file or just `console.log` session id to 
 SPLIT_SPEC_SESSION_ID=$(split-spec-cli create-session (args for split spec client) | tail -1)
 ```
 
-## Example with cypress
+### Run Cypress
 
-`split-specs-client` also exports function `runCypress`, which will handle split-specs service interaction for you and execute cypress.  
-Signature: `runCypress`(`SplitSpecsArguments` object, `Cypress config` object, optional `function(Cypress Config, spec name): Cypress Config`)  
-Just add your information to env variables (machineId, project name, split-specs api key or account details, sessionId) and create a similar script:
+`split-specs-cli run --project test -token $split_spec_token --sessionId $split_spec_sessionId --machineId $split_spec_machineId ...cypress run args`
 
-```js
-// runner.js
-import { runCypress } from '@shelex/split-specs-client';
+with some cypress args:
+`split-specs-cli run --project sample -token sample --sessionId sample --machineId sample --env allure=true --browser chrome`
 
-runCypress(
-    {
-        machineId: process.env.SPLIT_TEST_MACHINE_ID || 'default',
-        project: process.env.SPLIT_TEST_PROJECT_NAME,
-        token: process.env.SPLIT_TEST_API_KEY,
-        sessionId: process.env.SPLIT_TEST_SESSION_ID
-    },
-    {
-        browser: 'chrome',
-        config: {
-            video: false
-        },
-        env: {
-            allure: true
-        }
-    }
-);
-```
+with plugin to manipulate configuration `function(config, specName):config`
+`split-specs-cli run --project sample -token sample --sessionId sample --machineId sample --config-plugin-path './updateConfig.js' --env allure=true --browser chrome`
 
-and then use it just by calling `node runner.js`.
-You can have multiple machines\actions\containers with such runner (with different machineId) and each runner will ask service for next spec file to execute.
+You can have multiple machines\actions\containers with such runner (with different `machineId`) and each runner will ask service for next spec file to execute.
 
 ## Registration
 

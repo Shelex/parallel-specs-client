@@ -1,31 +1,39 @@
-const SpecSplitClient = require('../splitter');
+const SpecSplitClient = require('../../splitter');
+const fs = require('fs');
+const path = require('path');
 
 class SplitSpecsCypress {
     client; //SpecSplitClient;
-    config; // CypressConfig
+    args; // CypressArgs
     machineId;
     previousSpecPassed = false;
     exitCode = 0;
-    updateConfigFn; //Function to update config based on spec
+    configPlugin; //Function to update config based on spec
 
-    constructor(splitSpecInfo, cypressConfig, updateConfigFn) {
+    constructor(splitSpecInfo, cypressArgs, configPluginPath) {
         this.client = new SpecSplitClient({
             project: splitSpecInfo.project,
             token: splitSpecInfo.token,
             sessionId: splitSpecInfo.sessionId
         });
-        this.config = cypressConfig;
         this.machineId = splitSpecInfo.machineId;
-        this.updateConfigFn = updateConfigFn;
+        this.args = cypressArgs;
+
+        const pluginPath =
+            configPluginPath && path.resolve('.', configPluginPath);
+        this.configPlugin = fs.existsSync(pluginPath) && require(pluginPath);
     }
 
     async cypressRun(spec) {
-        const cyConfig = { ...this.config, ...{ spec } };
-
-        this.updateConfigFn && this.updateConfigFn(cyConfig, spec);
-
         try {
             const cypress = require('cypress');
+
+            const config = await cypress.cli.parseRunArguments(this.args);
+
+            const cyConfig = { ...config, ...{ spec } };
+
+            this.updateConfigFn && this.updateConfigFn(cyConfig, spec);
+
             const results = await cypress.run(cyConfig);
 
             return results.status === 'finished' ? results.totalFailed : 1;
@@ -66,16 +74,12 @@ class SplitSpecsCypress {
     }
 }
 
-const RunCypress = async (splitSpecInfo, cypressConfig, configFn) => {
-    const runner = new SplitSpecsCypress(
-        splitSpecInfo,
-        cypressConfig,
-        configFn
-    );
+const RunCypress = async (splitSpecInfo, cypressArgs, configFn) => {
+    const runner = new SplitSpecsCypress(splitSpecInfo, cypressArgs, configFn);
 
     await runner.run();
 
     return runner.exitCode;
 };
 
-module.exports = RunCypress;
+module.exports = { RunCypress };

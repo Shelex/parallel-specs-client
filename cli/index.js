@@ -4,12 +4,12 @@ const SplitSpecClient = require('../splitter');
 const readSpecFiles = require('../filereader');
 const fs = require('fs');
 const { readCyConfig } = require('./checkCyConfig');
+const { cypressRunCommand } = require('./cypress/command');
 
-const program = new Command();
+const cli = new Command();
 
 // split-specs-cli create-session (args for split spec client)
-program
-    .command('create-session')
+cli.command('create-session')
     .addOption(new Option('-p, --project <string>').makeOptionMandatory())
     .addOption(
         new Option('-t, --token [string]', 'split-specs api token')
@@ -85,4 +85,6 @@ program
               console.log(session.sessionId);
     });
 
-program.parse(process.argv);
+cli.addCommand(cypressRunCommand(cli));
+
+cli.parse(process.argv);
