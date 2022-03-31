@@ -32,7 +32,7 @@ class SplitSpecsCypress {
 
             const cyConfig = { ...config, ...{ spec } };
 
-            this.updateConfigFn && this.updateConfigFn(cyConfig, spec);
+            this.configPlugin && this.configPlugin(cyConfig, spec);
 
             const results = await cypress.run(cyConfig);
 
