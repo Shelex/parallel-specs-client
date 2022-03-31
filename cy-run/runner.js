@@ -1,74 +1,81 @@
 const SpecSplitClient = require('../splitter');
 
-const RunCypress = (splitSpecInfo, cypressConfig, configFn) => {
-    const cypress = require('cypress');
+class SplitSpecsCypress {
+    client; //SpecSplitClient;
+    config; // CypressConfig
+    machineId;
+    previousSpecPassed = false;
+    exitCode = 0;
+    updateConfigFn; //Function to update config based on spec
 
-    const machineId = splitSpecInfo.machineId;
-    let previousSpecPassed = true;
-
-    const client = new SpecSplitClient({
-        project: splitSpecInfo.project,
-        token: splitSpecInfo.token,
-        sessionId: splitSpecInfo.sessionId
-    });
-
-    process.exitCode = 0;
-
-    const cypressTask = (spec) => {
-        return new Promise((resolve, reject) => {
-            const cyConfig = { ...cypressConfig, ...{ spec } };
-
-            if (configFn) {
-                configFn(cyConfig, spec);
-            }
-
-            cypress
-                .run(cyConfig)
-                .then((results) => {
-                    process.exitCode += results.totalFailed || 0;
-                    previousSpecPassed = !results.totalFailed;
-                    resolve(results);
-                })
-                .catch((err) => {
-                    console.log(err);
-                    process.exitCode === 0 && (process.exitCode = 1);
-                    previousSpecPassed = false;
-                    reject(err);
-                });
+    constructor(splitSpecInfo, cypressConfig, updateConfigFn) {
+        this.client = new SpecSplitClient({
+            project: splitSpecInfo.project,
+            token: splitSpecInfo.token,
+            sessionId: splitSpecInfo.sessionId
         });
-    };
+        this.config = cypressConfig;
+        this.machineId = splitSpecInfo.machineId;
+        this.updateConfigFn = updateConfigFn;
+    }
 
-    function next(machineId) {
-        const nextSpec = client.nextSpec({
-            machineId: machineId,
-            isPassed: previousSpecPassed
-        });
-        if (nextSpec) {
-            console.log(
-                `Got next spec to run (${nextSpec}) for machine ${machineId}`
-            );
-            return cypressTask(nextSpec);
-        } else {
-            return Promise.reject(`All specs are finished for ${machineId}`);
+    async cypressRun(spec) {
+        const cyConfig = { ...this.config, ...{ spec } };
+
+        this.updateConfigFn && this.updateConfigFn(cyConfig, spec);
+
+        try {
+            const cypress = require('cypress');
+            const results = await cypress.run(cyConfig);
+
+            return results.status === 'finished' ? results.totalFailed : 1;
+        } catch (e) {
+            console.log(e);
+            return 1;
         }
     }
 
-    // execute cypress run recursively taking next test from existing files
-    (function recursive() {
-        next(machineId)
-            .then(recursive)
-            .catch((e) => console.log(e))
-            .finally(() => {
-                if (process.exitCode || 0 > 0) {
-                    throw new Error(
-                        `Test runner process exit with code ${process.exitCode}`
-                    );
-                }
-                console.log(
-                    `Test runner process exit with code ${process.exitCode}`
-                );
-            });
-    })();
+    async next() {
+        const nextSpec = this.client.nextSpec({
+            machineId: this.machineId,
+            isPassed: this.previousSpecPassed
+        });
+
+        if (!nextSpec) {
+            console.log(`All specs are finished for ${this.machineId}`);
+            return -1;
+        }
+
+        console.log(
+            `Got next spec to run (${nextSpec}) for machine ${this.machineId}`
+        );
+        return this.cypressRun(nextSpec);
+    }
+
+    async run() {
+        const currentCode = await this.next();
+
+        if (currentCode === -1) {
+            return this.exitCode;
+        }
+
+        this.previousSpecPassed = currentCode === 0;
+        this.exitCode += currentCode;
+
+        return this.run();
+    }
+}
+
+const RunCypress = async (splitSpecInfo, cypressConfig, configFn) => {
+    const runner = new SplitSpecsCypress(
+        splitSpecInfo,
+        cypressConfig,
+        configFn
+    );
+
+    await runner.run();
+
+    return runner.exitCode;
 };
 
 module.exports = RunCypress;
