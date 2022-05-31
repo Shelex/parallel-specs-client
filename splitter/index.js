@@ -2,8 +2,12 @@ const split = require('./api');
 
 class SpecSplitClient {
     options = {
-        url: 'https://split-specs.appspot.com/query',
-        project: null,
+        baseUrl: 'https://split-specs.shelex.dev/api',
+        get url() {
+            return path => `${this.baseUrl}/${path}`
+        },
+        projectName: null,
+        projectId: null,
         sessionId: null,
         token: null,
         email: null,
@@ -14,61 +18,62 @@ class SpecSplitClient {
         this.options = { ...this.options, ...options };
         if (!this.options.token) {
             const res = split.login(this.options);
+            console.log(res)
             handleError(res);
-            this.options.token = res.data.login;
+            this.options.token = res.token;
         }
     }
 
-    project(name = this.options.project) {
-        const res = split.projectInfo(this.options, name);
+    project(id) {
+        if (id) {
+            this.options.projectId = id
+        }
+        if (!this.options.projectId) {
+            throw new Error(`project id not available, cannot identify project`)
+        }
+        const res = split.projectInfo(this.options);
         handleError(res);
-        return res.data.project;
+        return res;
     }
 
     nextSpec(nextOptions = {}) {
         nextOptions = Object.assign(
             {
                 machineId: 'default',
-                sessionId: this.options.sessionId,
-                isPassed: false
+                previousStatus: 'unknown'
             },
             nextOptions
         );
-        const res = split.nextSpec(this.options, nextOptions);
+        const res = split.nextSpec(this.options, this.options.sessionId, nextOptions);
         if (res.errors) {
-            if (res.errors[0].message.includes('finished')) {
+            if (res.errors.some(message => message.includes('finished'))) {
                 return null;
             }
             handleError(res);
         }
-        return res.data.nextSpec;
+        return res.next;
     }
 
     addSession(specs, projectName = this.options.project) {
         const res = split.createSession(this.options, projectName, specs);
         handleError(res);
-        if (res && res.data && res.data && res.data.addSession) {
-            this.options.sessionId = res.data.addSession.sessionId;
+        if (res) {
+            this.options.sessionId = res.sessionId;
+            this.options.projectId = res.projectId;
+            this.options.projectName = res.projectName;
         }
-        return res.data.addSession;
+        return res;
     }
 }
 
-const gqlError = (errors) => {
-    const [err] = errors;
-    let message = `${err.message}`;
-    if (err.path) {
-        message += ` ${err.path.join('.')}`;
-    }
-    if (err.extensions) {
-        message += ` code: ${err.extensions.code}`;
-    }
+const getMessage = (errors) => {
+    const [message] = errors;
     return message;
 };
 
 const handleError = (res) => {
     if (res.errors) {
-        throw new Error(gqlError(res.errors));
+        throw new Error(getMessage(res.errors));
     }
 };
 

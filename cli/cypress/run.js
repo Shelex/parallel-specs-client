@@ -6,7 +6,7 @@ class SplitSpecsCypress {
     client; //SpecSplitClient;
     args; // CypressArgs
     machineId;
-    previousSpecPassed = false;
+    previousStatus = 'unknown';
     exitCode = 0;
     configPlugin; //Function to update config based on spec
 
@@ -46,7 +46,7 @@ class SplitSpecsCypress {
     async next() {
         const nextSpec = this.client.nextSpec({
             machineId: this.machineId,
-            isPassed: this.previousSpecPassed
+            previousStatus: this.previousStatus
         });
 
         if (!nextSpec) {
@@ -67,7 +67,7 @@ class SplitSpecsCypress {
             return this.exitCode;
         }
 
-        this.previousSpecPassed = currentCode === 0;
+        this.previousStatus = currentCode === 0 ? 'passed' : 'failed';
         this.exitCode += currentCode;
 
         return this.run();

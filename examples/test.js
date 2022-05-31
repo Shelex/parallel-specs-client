@@ -8,21 +8,24 @@ const [executors, cmd, ...args] = process.argv.slice(2);
 // pass credentials and project
 const client = new SpecSplitClient({
     project: 'test',
-    email: 'admin@example.com',
-    password: 'admin'
+    email: 'test@test.com',
+    password: 'test'
 });
 
 // get all specs but ignore spec8
 const specs = filesToSpecInput(['**/specs/*.js'], ['**/spec8.js']);
 
 // create new session
-client.addSession(specs);
+const res = client.addSession(specs);
+
+console.log(`created session ${res.sessionId}`);
 
 let exitCode = 0;
 
 function next(machineID) {
     const nextSpec = client.nextSpec({
-        machineId: machineID
+        machineId: machineID,
+        previousStatus: exitCode === 0 ? 'passed' : 'failed'
     });
     if (nextSpec) {
         process.stdout.write(

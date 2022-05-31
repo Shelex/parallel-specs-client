@@ -8,6 +8,12 @@
 API Client library for [Split specs](https://github.com/Shelex/split-specs).  
 Service could be used as orchestrator for your spec files during parallel testing across different machines/containers.
 
+## Registration
+
+You can register your account at [split-specs UI](https://split-specs.shelex.dev)
+or use demo credentials - email: `test@test.com` and password: `test`.  
+Source code: [split-specs](https://github.com/Shelex/split-specs).
+
 ## Install
 
 -   yarn:
@@ -30,8 +36,8 @@ import { SpecSplitClient, filesToSpecInput } from '@shelex/split-specs-client';
 
 const client = new SpecSplitClient({
     project: 'test',
-    email: 'admin@example.com',
-    password: 'admin'
+    email: 'test@test.com',
+    password: 'test'
 });
 
 /**
@@ -87,28 +93,15 @@ with plugin to manipulate configuration `function(config, specName):config`
 
 You can have multiple machines\actions\containers with such runner (with different `machineId`) and each runner will ask service for next spec file to execute.
 
-## Registration
-
-You can register your account at [split-specs UI](http://split-specs.appspot.com)
-by executing query:
-
-```gql
-mutation {
-    register(input: { email: "email@example.com", password: "password" })
-}
-```
-
-More documentation regarding available API is in [split-specs](https://github.com/Shelex/split-specs) repository.
-
 ## API
 
 ### `const client = new SpecSplitClient({options})`
 
 Constructor. `options` may contain inital values for:
 
--   `url`, default: "http://split-specs.appspot.com/query"; url for split-specs service queries
+-   `url`, default: "https://split-specs.shelex.dev/api"; url for split-specs service queries
 -   `project`, may be also passed as second argument to `addSession`
--   `token`, in case you have obtained token in web version (valid for 24h) or other way, it could be passed so login step will be skipped
+-   `token`, in case you have obtained token in web version or other way, it could be passed so login step will be skipped
 -   `email` and `password`, in case token option is empty, constructor will call login method with this credentials to obtain token
 
 ### `client.addSession(specs: SpecInput[], projectName?: string): {sessionId: string}`
@@ -116,14 +109,14 @@ Constructor. `options` may contain inital values for:
 Create a new session for project. Project will be reused, or created in case it still not exist.  
 Returns object with property sessionID that could be used for retrieving spec.
 
-### `client.nextSpec({ machineId?: string, sessionId?: string, isPassed?: boolean }): string;`
+### `client.nextSpec({ machineId?: string, sessionId?: string, previousStatus?: string }): string;`
 
 Get next spec for machineId + sessionId, returns spec filePath.  
 Ends previous spec for this machineId + sessionId in case it exists.
 
-### `project(name?: string): Project`
+### `project(id?: string): Project`
 
-Get project details with all sessions conducted
+Get project details with latest 15 sessions
 
 ## Motivation
 
@@ -132,7 +125,7 @@ Potentially, some UI could be built on top of [Split specs](https://github.com/S
 
 ## License
 
-Copyright © 2021 Oleksandr Shevtsov <ovr.shevtsov@gmail.com>
+Copyright © 2022 Oleksandr Shevtsov <ovr.shevtsov@gmail.com>
 
 This work is free. You can redistribute it and/or modify it under the
 terms of the [MIT License](https://opensource.org/licenses/MIT).

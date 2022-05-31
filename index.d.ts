@@ -40,7 +40,7 @@ export type SpecInput = {
 export type NextSpecOptions = {
     sessionId?: string;
     machineId?: string;
-    isPassed?: boolean;
+    previousStatus?: string;
 };
 
 export class SpecSplitClient {

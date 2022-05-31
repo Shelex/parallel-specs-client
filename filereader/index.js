@@ -1,5 +1,5 @@
 const glob = require('fast-glob');
-const minimatch = require('minimatch');
+const minimatch = require('minimatch')
 
 const findSpecFiles = (includes = [], excludes = []) => {
     const files = includes.reduce((files, pattern) => {
@@ -24,7 +24,4 @@ const findSpecFiles = (includes = [], excludes = []) => {
     );
 };
 
-const filesToSpecInput = (includes, excludes) =>
-    findSpecFiles(includes, excludes).map((file) => ({ filePath: file }));
-
-module.exports = filesToSpecInput;
+module.exports = findSpecFiles;

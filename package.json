@@ -32,9 +32,12 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "commander": "9.1.0",
+        "commander": "9.3.0",
         "fast-glob": "3.2.11",
-        "minimatch": "3.1.2",
-        "sync-fetch": "0.3.1"
+        "minimatch": "5.1.0",
+        "sync-fetch": "0.4.1"
+    },
+    "devDependencies": {
+        "cypress": "9.7.0"
     }
 }
