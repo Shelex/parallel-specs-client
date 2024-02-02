@@ -1,5 +1,5 @@
 import { Pattern } from 'fast-glob';
-export interface SplitterOptions {
+export interface ParallelOptions {
     url?: string;
     project?: string;
     token?: string;
@@ -43,13 +43,13 @@ export type NextSpecOptions = {
     previousStatus?: string;
 };
 
-export class SpecSplitClient {
-    readonly options: SplitterOptions;
+export class ParallelSpecsClient {
+    readonly options: ParallelOptions;
 
-    constructor(options?: SplitterOptions);
+    constructor(options?: ParallelOptions);
 
     project(name?: string): Project;
-    nextSpec(options?: NextSpecOptions): string;
+    next(options?: NextSpecOptions): string;
     addSession(specs: SpecInput[], projectName?: string): AddSessionResponse;
 }
 
@@ -58,7 +58,7 @@ export function filesToSpecInput(
     exludes: Pattern[]
 ): SpecInput[];
 
-export interface SplitSpecInfo {
+export interface ParallelSpecInfo {
     project: string;
     sessionId: string;
     machineId: string;
@@ -67,14 +67,3 @@ export interface SplitSpecInfo {
     email?: string;
     password?: string;
 }
-
-export type CypressConfig = any;
-export interface ConfigFn {
-    (config: CypressConfig, spec: string): CypressConfig;
-}
-
-export function cypressRun(
-    splitSpecInfo: SplitSpecInfo,
-    cypressConfig: CypressConfig,
-    configFn?: ConfigFn
-): void;

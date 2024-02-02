@@ -43,7 +43,7 @@ const createSession = (opts, projectName, specs) =>
         specFiles: specs
     });
 
-const nextSpec = (opts, sessionId, nextOptions) =>
+const next = (opts, sessionId, nextOptions) =>
     request(
         `session/${sessionId}/next?${new URLSearchParams(nextOptions)}`,
         'GET',
@@ -61,5 +61,5 @@ module.exports = {
     login,
     projectInfo,
     createSession,
-    nextSpec
+    next
 };

@@ -1,11 +1,11 @@
 {
-    "name": "@shelex/split-specs-client",
+    "name": "@shelex/parallel-specs-client",
     "version": "0.0.0-development",
     "description": "api client for orchestrator service for your spec files during parallel testing across different machines",
     "main": "index.js",
     "types": "index.d.ts",
     "bin": {
-        "split-specs-cli": "cli/index.js"
+        "parallel-specs-cli": "cli/index.js"
     },
     "scripts": {
         "cy:run": "npx cypress run",
@@ -17,9 +17,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Shelex/split-specs-client.git"
+        "url": "https://github.com/Shelex/parallel-specs-client.git"
     },
-    "bugs": "https://github.com/Shelex/split-specs-client/issues",
+    "bugs": "https://github.com/Shelex/parallel-specs-client/issues",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
         "access": "public"
@@ -33,11 +33,12 @@
     "license": "MIT",
     "dependencies": {
         "commander": "9.3.0",
-        "fast-glob": "3.2.11",
-        "minimatch": "5.1.0",
-        "sync-fetch": "0.4.1"
+        "fast-glob": "3.3.2",
+        "minimatch": "9.0.3",
+        "sync-fetch": "0.5.2"
     },
     "devDependencies": {
-        "cypress": "9.7.0"
+        "cypress": "9.7.0",
+        "dotenv": "16.4.1"
     }
 }

@@ -1,8 +1,8 @@
-const split = require('./api');
+const parallelSpecs = require('./api');
 
-class SpecSplitClient {
+class ParallelSpecsClient {
     options = {
-        baseUrl: 'https://split-specs.shelex.dev/api',
+        baseUrl: 'https://parallel-specs.shelex.dev/api',
         get url() {
             return path => `${this.baseUrl}/${path}`
         },
@@ -17,7 +17,7 @@ class SpecSplitClient {
     constructor(options = {}) {
         this.options = { ...this.options, ...options };
         if (!this.options.token) {
-            const res = split.login(this.options);
+            const res = parallelSpecs.login(this.options);
             console.log(res)
             handleError(res);
             this.options.token = res.token;
@@ -31,12 +31,12 @@ class SpecSplitClient {
         if (!this.options.projectId) {
             throw new Error(`project id not available, cannot identify project`)
         }
-        const res = split.projectInfo(this.options);
+        const res = parallelSpecs.projectInfo(this.options);
         handleError(res);
         return res;
     }
 
-    nextSpec(nextOptions = {}) {
+    next(nextOptions = {}) {
         nextOptions = Object.assign(
             {
                 machineId: 'default',
@@ -44,7 +44,7 @@ class SpecSplitClient {
             },
             nextOptions
         );
-        const res = split.nextSpec(this.options, this.options.sessionId, nextOptions);
+        const res = parallelSpecs.next(this.options, this.options.sessionId, nextOptions);
         if (res.errors) {
             if (res.errors.some(message => message.includes('finished'))) {
                 return null;
@@ -55,7 +55,7 @@ class SpecSplitClient {
     }
 
     addSession(specs, projectName = this.options.project) {
-        const res = split.createSession(this.options, projectName, specs);
+        const res = parallelSpecs.createSession(this.options, projectName, specs);
         handleError(res);
         if (res) {
             this.options.sessionId = res.sessionId;
@@ -77,4 +77,4 @@ const handleError = (res) => {
     }
 };
 
-module.exports = SpecSplitClient;
+module.exports = ParallelSpecsClient;

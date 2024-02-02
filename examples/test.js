@@ -1,19 +1,24 @@
 #!/usr/bin/env node
-const { SpecSplitClient, filesToSpecInput } = require('../index');
+const dotenv = require('dotenv');
+const { ParallelSpecsClient, filesToSpecInput } = require('../index');
 const { spawn } = require('child_process');
+
+dotenv.config();
 
 // get number of executors, command and arguments
 const [executors, cmd, ...args] = process.argv.slice(2);
 
 // pass credentials and project
-const client = new SpecSplitClient({
-    project: 'test',
-    email: 'test@test.com',
-    password: 'test'
+const client = new ParallelSpecsClient({
+    project: process.env.PARALLEL_SPECS_PROJECT_NAME,
+    token: process.env.PARALLEL_SPECS_API_KEY
 });
 
 // get all specs but ignore spec8
-const specs = filesToSpecInput(['**/specs/*.js'], ['**/spec8.js']);
+//const specs = filesToSpecInput(['**/specs/*.js'], ['**/spec8.js']);
+
+// get all specs
+const specs = filesToSpecInput(['**/specs/*.js']);
 
 // create new session
 const res = client.addSession(specs);
@@ -22,14 +27,14 @@ console.log(`created session ${res.sessionId}`);
 
 let exitCode = 0;
 
-function next(machineID) {
-    const nextSpec = client.nextSpec({
-        machineId: machineID,
+function next(machineId) {
+    const nextSpec = client.next({
+        machineId,
         previousStatus: exitCode === 0 ? 'passed' : 'failed'
     });
     if (nextSpec) {
         process.stdout.write(
-            `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineID}\n`
+            `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineId}\n`
         );
 
         return new Promise((resolve, reject) => {
@@ -46,21 +51,15 @@ function next(machineID) {
             });
         });
     } else {
-        return Promise.reject(`ALL SPECS PROCESSED for ${machineID}\n`);
+        return Promise.reject(`ALL SPECS PROCESSED for ${machineId}\n`);
     }
 }
 
-const executor = (machineID) => {
-    return new Promise((resolve) => {
-        resolve(
-            (function recursive() {
-                next(machineID)
-                    .then(recursive)
-                    .catch((e) => console.log(e));
-            })()
-        );
-    });
-};
+const executor = (machineId) => Promise.resolve((function recursive() {
+    next(machineId)
+        .then(recursive)
+        .catch((e) => console.log(e));
+})())
 
 const runners = Array.from({ length: executors }, (_, v) =>
     executor(`machine${v + 1}`)

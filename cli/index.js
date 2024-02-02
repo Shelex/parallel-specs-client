@@ -1,31 +1,29 @@
 #!/usr/bin/env node
 const { Option, Command, InvalidOptionArgumentError } = require('commander');
-const SplitSpecClient = require('../splitter');
+const ParallelSpecsClient = require('../splitter');
 const readSpecFiles = require('../filereader');
 const fs = require('fs');
-const { readCyConfig } = require('./checkCyConfig');
-const { cypressRunCommand } = require('./cypress/command');
 
 const cli = new Command();
 
-// split-specs-cli create-session (args for split spec client)
+// parallel-specs-cli create-session (args for parallel spec client)
 cli.command('create-session')
     .addOption(new Option('-p, --project <string>').makeOptionMandatory())
     .addOption(
-        new Option('-t, --token [string]', 'split-specs api token')
+        new Option('-t, --token [string]', 'parallel-specs api token')
             .conflicts('email')
             .conflicts('password')
     )
     .addOption(
         new Option(
             '--email [string]',
-            'split-specs account username'
+            'parallel-specs account username'
         ).conflicts('token')
     )
     .addOption(
         new Option(
             '--password [string]',
-            'split-specs account password'
+            'parallel-specs account password'
         ).conflicts('token')
     )
     .addOption(
@@ -43,11 +41,11 @@ cli.command('create-session')
     .addOption(
         new Option(
             '--save-as-file',
-            'save session data to split-spec-session.json'
+            'save session data to parallel-specs-session.json'
         ).default(false)
     )
     .action((options) => {
-        if (!options.password && !options.token && !options.email) {
+        if (!options.email && !options.password && !options.token) {
             throw new InvalidOptionArgumentError(
                 `required options '--token [string]' OR '--email [string] --password [string]' not specified`
             );
@@ -55,13 +53,9 @@ cli.command('create-session')
         options.includeSpecs = options.includeSpecs || [];
         options.excludeSpecs = options.excludeSpecs || [];
 
-        const client = new SplitSpecClient(options);
+        const client = new ParallelSpecsClient(options);
 
-        const cfg = readCyConfig();
-        const specs = readSpecFiles(
-            [...options.includeSpecs, ...cfg.include],
-            [...options.excludeSpecs, ...cfg.ignore]
-        );
+        const specs = readSpecFiles(options.includeSpecs, options.excludeSpecs)
 
         const session = client.addSession(specs);
         console.log(
@@ -70,7 +64,7 @@ cli.command('create-session')
 
         options.saveAsFile
             ? fs.writeFileSync(
-                  'split-spec-session.json',
+                  'parallel-specs-session.json',
                   JSON.stringify(
                       {
                           id: session.sessionId,
@@ -81,10 +75,8 @@ cli.command('create-session')
                   )
               )
             : // you can grab this last output line on CI in case need to share session-id as env variable
-              // SPLIT_SPEC_SESSION_ID=$(split-spec-cli create-session (args for split spec client) | tail -1)
+              // PARALLEL_SPECS_SESSION_ID=$(parallel-specs-cli create-session (args for parallel spec client) | tail -1)
               console.log(session.sessionId);
     });
-
-cli.addCommand(cypressRunCommand(cli));
 
 cli.parse(process.argv);
