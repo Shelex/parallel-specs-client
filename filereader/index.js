@@ -1,5 +1,5 @@
 const glob = require('fast-glob');
-const minimatch = require('minimatch')
+const { minimatch } = require('minimatch');
 
 const findSpecFiles = (includes = [], excludes = []) => {
     const files = includes.reduce((files, pattern) => {
@@ -12,9 +12,7 @@ const findSpecFiles = (includes = [], excludes = []) => {
         return files;
     }, []);
 
-    const uniqueFilesSet = new Set(files);
-
-    const uniqueFiles = Array.from(uniqueFilesSet);
+    const uniqueFiles = Array.from(new Set(files));
 
     return uniqueFiles.filter(
         (file) =>

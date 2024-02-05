@@ -32,34 +32,38 @@ function next(machineId) {
         machineId,
         previousStatus: exitCode === 0 ? 'passed' : 'failed'
     });
-    if (nextSpec) {
-        process.stdout.write(
-            `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineId}\n`
-        );
 
-        return new Promise((resolve, reject) => {
-            const arg = [...args, '--spec', nextSpec];
-            const child_process = spawn(cmd, arg);
-
-            child_process.on('exit', (code) => {
-                return resolve(() => {
-                    exitCode += code;
-                });
-            });
-            child_process.on('error', (err) => {
-                return reject(err);
-            });
-        });
-    } else {
+    if (!nextSpec) {
         return Promise.reject(`ALL SPECS PROCESSED for ${machineId}\n`);
     }
+
+    process.stdout.write(
+        `PICKING UP NEXT TASK (${nextSpec}) for machine ${machineId}\n`
+    );
+
+    return new Promise((resolve, reject) => {
+        const arg = [...args, '--spec', nextSpec];
+        const child_process = spawn(cmd, arg);
+
+        child_process.on('exit', (code) => {
+            return resolve(() => {
+                exitCode += code;
+            });
+        });
+        child_process.on('error', (err) => {
+            return reject(err);
+        });
+    });
 }
 
-const executor = (machineId) => Promise.resolve((function recursive() {
-    next(machineId)
-        .then(recursive)
-        .catch((e) => console.log(e));
-})())
+const executor = (machineId) =>
+    Promise.resolve(
+        (function recursive() {
+            next(machineId)
+                .then(recursive)
+                .catch((e) => console.log(e));
+        })()
+    );
 
 const runners = Array.from({ length: executors }, (_, v) =>
     executor(`machine${v + 1}`)
