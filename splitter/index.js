@@ -2,7 +2,7 @@ const parallelSpecs = require('./api');
 
 class ParallelSpecsClient {
     options = {
-        baseUrl: 'https://parallel-specs.shelex.dev/api',
+        baseUrl: 'https://parallel-specs-api.shelex.dev/api',
         get url() {
             return path => `${this.baseUrl}/${path}`
         },
